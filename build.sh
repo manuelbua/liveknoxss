@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILENAME=liveknoxss-extension.xpi
+FILENAME=liveknoxss-extension-`gitver current`.xpi
 OUT=/tmp/$FILENAME
 
 touch "$OUT"
