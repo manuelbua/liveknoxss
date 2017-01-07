@@ -8,9 +8,23 @@ var ui_toggle = document.querySelector('#toggle');
 var ui_results = document.querySelector('#results');
 var ui_title = document.querySelector('#title');
 var ui_linktext = document.querySelector('#linktext');
-var ui_target = document.querySelector('#target');
+var ui_view = document.querySelector('#view');
 var ui_copy = document.querySelector('#copy');
 var ui_versioninfo = document.querySelector('#versioninfo');
+var ui_opennewtab = document.querySelectorAll('.open-newtab');
+
+/* force links to open in new tabs */
+for(var e of ui_opennewtab) {
+	e.onclick = function(e) {
+		// open new tab
+		browser.tabs.create({url: this.href});
+
+		// close the popup
+		window.close();
+		return false;
+	}
+}
+
 /* Utilities */
 function getVersion() {
 	return typeof version !== 'undefined' ? ('v' + version) : '(unknown build)';
@@ -93,11 +107,11 @@ function updateUI(data) {
 			setHtml(ui_title, "<span class='xss'>An XSS has been found!</span>");
 			var url = state.urls[0];
 			ui_linktext.value = url;
-			ui_target.href = url;
+			ui_view.href = url;
 		} else {
 			setText(ui_title, state.active ? "No XSS found yet." : "");
 			ui_linktext.value = '';
-			ui_target.href = '';
+			ui_view.href = '';
 		}
 	}
 }
@@ -108,6 +122,7 @@ function reload() {
 	});
 }
 
+/* tell the background script to toggle the extension for this domain */
 ui_toggle.onclick = function(e) {
 	browser.runtime.sendMessage({toggle: true}).then(
 		function(response) {
@@ -121,6 +136,7 @@ ui_toggle.onclick = function(e) {
 	);
 }
 
+/* copy to clipboard */
 ui_copy.onclick = function(e) {
 	ui_linktext.select();
 	document.execCommand("copy");
