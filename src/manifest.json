@@ -1,9 +1,21 @@
+
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+// This is a GENERATED file, DO NOT TOUCH!
+
 {
 	"manifest_version": 2,
 
 	"name": "LiveKNOXSS",
 	"description": "A WebExtension that monitors the URL for changes and submit it automatically to the KNOXSS Pro service for an XSS live scan as you browse.\n\n* DISCLAIMER\nI will not be responsible or liable, directly or indirectly, in any way for any loss or damage of any kind incurred as a result of its usage.\n\n* PRIVACY\nThis extension will send a target URL along with any collected cookie for that domain to the KNOXSS service for a live scan.\n\n* REQUIREMENTS\nYou need to be logged into your KNOXSS account first!",
-	"version": "0.6.0",
+	"version": "0.1.0",
 
 	"homepage_url": "https://twitter.com/therealdudez",
 	"developer": {
@@ -30,7 +42,7 @@
 	},
 
 	"background": {
-		"scripts": ["knoxss.js"]
+		"scripts": ["version.js", "knoxss.js"]
 	},
 
 	"permissions": [

@@ -10,6 +10,11 @@ var ui_title = document.querySelector('#title');
 var ui_linktext = document.querySelector('#linktext');
 var ui_target = document.querySelector('#target');
 var ui_copy = document.querySelector('#copy');
+var ui_versioninfo = document.querySelector('#versioninfo');
+/* Utilities */
+function getVersion() {
+	return typeof version !== 'undefined' ? ('v' + version) : '(unknown build)';
+}
 
 function setText(e, text) {
 	e.textContent = text;
@@ -35,6 +40,7 @@ function show(e) {
 
 function updateUI(data) {
 	ui_icon.src = browser.extension.getURL('icons/k.png');
+	setHtml(ui_versioninfo, "LiveKNOXSS <strong>" + getVersion() + "</strong>");
 
 	if ( !data.knoxssState || !data.knoxssCurrentDomain ) {
 		// no state for this domain

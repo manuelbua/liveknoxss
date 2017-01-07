@@ -142,6 +142,7 @@ function tabUpdate(tabId, changeInfo, tab) {
 }
 
 function main() {
+	console.log("This is LiveKNOXSS " + getVersion());
 	/* update the state for the currently active tab */
 	getActiveTab().then(tabs => {
 		var tab = tabs[0];
@@ -153,6 +154,11 @@ main();
 
 
 /** Utilities */
+
+/* returns the extension version */
+function getVersion() {
+	return typeof version !== 'undefined' ? ('v' + version) : '(unknown build)';
+}
 
 /* gets the domain from the specified URL */
 function getDomainFromURL(url) {

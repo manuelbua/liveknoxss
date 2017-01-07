@@ -74,3 +74,9 @@ td {
 	background-color: #d0d0d0;
 	width: 100%;
 }
+
+#version {
+	font-size: 10px;
+	padding: 1px;
+	background-color: rgba(0,0,0,0.06);
+}
