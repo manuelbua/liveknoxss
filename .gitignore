@@ -1,2 +1,3 @@
 .gitver
 src/version.js
+bin/

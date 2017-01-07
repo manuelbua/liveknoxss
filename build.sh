@@ -1,11 +1,11 @@
 #!/bin/bash
 
 FILENAME=liveknoxss-extension-`gitver current`.xpi
-OUT=/tmp/$FILENAME
+OUT=bin/$FILENAME
 
-touch "$OUT"
-rm "$OUT"
+mkdir bin 2>/dev/null
+rm -f "$OUT"
 
 pushd src
-zip -1 -r "$OUT" *
+zip -1 -r "../$OUT" *
 popd
