@@ -194,7 +194,7 @@ function updateUI(tab, domain, state) {
 		console.log("LiveKNOXSS active for \"" + domain + "\"");
 	} else if( state.xssed ) {
 		setBadge("XSS", "#FF0000");
-		console.log("The KNOXSS service found an XSS vulnerability on \"" + domain + "\"!\r\nVulnerable: " + ds.urls[0]);
+		console.log("The KNOXSS service found an XSS vulnerability on \"" + domain + "\"!\r\nVulnerable: " + state.urls[0]);
 	}
 }
 
