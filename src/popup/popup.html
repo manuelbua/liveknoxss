@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="popup.css"/>
+	</head>
+	<body>
+		<table width="100%">
+			<tr>
+				<td width="40px">
+					<img id="icon" width="32px" />
+				</td>
+				<td>
+					<h3 id="domain">domain</h3>
+					<h4 id="state">state</h4>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><button id="toggle"></button></td>
+			</tr>
+		</table>
+		<h4 id="title"></h4>
+		<table id="results" width="100%">
+			<tr>
+				<td width="100%">
+					<input id="linktext" readonly />
+				</td>
+				<td align="right">
+					<a id="target" href="#" target="_blank">view</a><br/>
+					<a id="copy" href="javascript:">copy</a>
+				</td>
+			</tr>
+		</table>
+		<script src="popup.js"></script>
+	</body>
+</html>

@@ -1,0 +1,76 @@
+* {
+	box-sizing: border-box;
+}
+
+html {
+	font-family: Liberation, Liberation Sans, sans, sans-serif;
+	font-size: 11px;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: Liberation, Liberation Sans, sans, sans-serif;
+	font-size: 11px;
+	min-width: 300px;
+	height: auto;
+	padding: 2px;
+	margin: 2px;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+	margin: 0;
+	padding: 0;
+}
+
+td {
+	vertical-align: top;
+}
+
+.active {
+	color: #20af20 !important;
+}
+
+.inactive, .xssed {
+	color: #ff2020 !important;
+}
+
+.unsupported {
+	color: #FFA500 !important;
+}
+
+.domain {
+	color: #2020ff !important;
+}
+
+#toggle {
+	width: 100%;
+	height: 50px;
+	text-align: center;
+	font-size: 12px;
+}
+
+.hidden {
+	display: none !important;
+}
+
+
+#title {
+	text-align: center;
+	margin: 4px 0;
+	font-weight: normal;
+}
+
+#title .xss {
+	color: #ff2020 !important;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+#linktext {
+	font-family: monospace;
+	padding: 4px;
+	border: solid 1px #efefef;
+	background-color: #d0d0d0;
+	width: 100%;
+}
