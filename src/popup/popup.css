@@ -45,11 +45,17 @@ td {
 }
 
 #toggle {
-	width: 80%;
+	width: 90%;
 	height: 50px;
 	text-align: center;
 	font-size: 12px;
-	margin: 0 auto;
+	margin: 0 auto 5px;
+}
+
+#toggle:-moz-focus-inner,
+#toggle:-moz-focusring,
+#toggle:focus {
+	outline: 0px !important;
 }
 
 .hidden {
@@ -59,7 +65,8 @@ td {
 
 #title {
 	text-align: center;
-	margin: 4px 0;
+	margin: 0;
+	padding: 5px 0 10px 0;
 	font-weight: normal;
 }
 
@@ -88,18 +95,16 @@ td {
 	opacity: 1;
 }
 
-#version hr {
+hr {
 	margin: 0;
 	padding: 0;
 	border: 0;
 	border-top: 1px solid #d0d0d0;
 }
 
-#domainlist {
-	list-style-type: none;
-	text-indent: 0;
-	padding: 5px 0 0 0;
-	margin: 0;
+#domainlist, #result {
+	margin: 0 auto;
+	width: 90%;
 }
 
 #domainlist input[type="checkbox"] {
@@ -114,4 +119,14 @@ td {
 	width: 50%;
 	padding: 0;
 	margin: 0;
+}
+
+hr#domdivider {
+	margin: 0 auto 5px;
+	border-top: 1px solid #e0e0e0;
+	width: 90%;
+}
+
+#result {
+	padding: 0 0 5px 0;
 }

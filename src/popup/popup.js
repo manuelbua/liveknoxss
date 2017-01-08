@@ -13,6 +13,7 @@ var ui_copy = document.querySelector('#copy');
 var ui_versioninfo = document.querySelector('#versioninfo');
 var ui_opennewtab = document.querySelectorAll('.open-newtab');
 var ui_domainlist = document.querySelector('div#domainlist');
+var ui_domdivider = document.querySelector('#domdivider');
 
 // force links to open in new tabs
 for(var e of ui_opennewtab) {
@@ -92,7 +93,7 @@ function enableToggle(html) {
 }
 
 function showTitle(html) {
-	show(setHtml(ui_title, html));
+	show(setHtml(ui_title, "&nbsp;" + html + "&nbsp;"));
 }
 
 function hideTitle() {
@@ -119,6 +120,8 @@ function copyResultLinkToClipboard() {
 
 function showDomainList(domain_state) {
 	show(ui_domainlist);
+	show(ui_domdivider);
+
 	var html = '<h4>Domains seen this session:</h4>';
 	for(var d in domain_state) {
 		var s = domain_state[d];
@@ -134,6 +137,7 @@ function showDomainList(domain_state) {
 function hideDomainList() {
 	setHtml(ui_domainlist, "");
 	hide(ui_domainlist);
+	hide(ui_domdivider);
 }
 
 // resets the UI to a minimal state, only the icon, the
