@@ -124,7 +124,7 @@ ui_toggle.onclick = function(e) {
 	browser.runtime.sendMessage({toggle: true}).then(
 		function(response) {
 			if( response.toggled ) {
-				reload()
+				reload();
 			}
 		},
 		function(error) {
@@ -138,5 +138,8 @@ ui_copy.onclick = function(e) {
 	ui_linktext.select();
 	document.execCommand("copy");
 }
+
+/* reload data and update UI whenever it changes */
+browser.storage.onChanged.addListener((changes, area) => { reload(); });
 
 reload();
