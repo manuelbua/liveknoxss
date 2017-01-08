@@ -128,5 +128,11 @@ hr#domdivider {
 }
 
 #result {
-	padding: 0 0 5px 0;
+	margin: 2px;
+}
+
+#resultset {
+	width: 90%;
+	margin: 2px auto 12px;
+	padding: 0;
 }

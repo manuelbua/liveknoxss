@@ -14,6 +14,7 @@ var ui_versioninfo = document.querySelector('#versioninfo');
 var ui_opennewtab = document.querySelectorAll('.open-newtab');
 var ui_domainlist = document.querySelector('div#domainlist');
 var ui_domdivider = document.querySelector('#domdivider');
+var ui_resultset = document.querySelector('#resultset');
 
 // force links to open in new tabs
 for(var e of ui_opennewtab) {
@@ -103,12 +104,14 @@ function hideTitle() {
 
 function showResult(url) {
 	show(ui_result);
+	show(ui_resultset);
 	ui_linktext.value = url;
 	ui_view.href = url;
 }
 
 function hideResult() {
 	hide(ui_result);
+	hide(ui_resultset);
 	ui_linktext.value = '';
 	ui_view.href = '';
 }
