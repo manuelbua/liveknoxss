@@ -116,7 +116,7 @@ function updateUI(data) {
 }
 
 function reload() {
-	browser.storage.local.get(["knoxssState", "knoxssCurrentDomain"]).then(data => {
+	browser.storage.local.get(["knoxssState", "knoxssCurrentDomain"]).then((data) => {
 		updateUI(data);
 	});
 }

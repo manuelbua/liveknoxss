@@ -144,7 +144,7 @@ function tabUpdate(tabId, changeInfo, tab) {
 function main() {
 	console.log("This is LiveKNOXSS " + getVersion());
 	/* update the state for the currently active tab */
-	getActiveTab().then(tabs => {
+	getActiveTab().then((tabs) => {
 		var tab = tabs[0];
 		tabUpdate(tab.id, {status:'complete'}, tab);
 	});
