@@ -3,7 +3,7 @@
 
 	"name": "LiveKNOXSS",
 	"description": "A WebExtension that monitors the URL for changes and submit it automatically to the KNOXSS Pro service for an XSS live scan as you browse. You need to be logged into your KNOXSS account first!",
-	"version": "0.1.0-20+9671d16",
+	"version": "0.1.0.21",
 
 	"homepage_url": "https://twitter.com/therealdudez",
 	"developer": {
