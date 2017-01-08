@@ -1,15 +1,4 @@
 
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-// This is a GENERATED file, DO NOT TOUCH!
-
 {
 	"manifest_version": 2,
 
@@ -34,12 +23,6 @@
 		"default_icon": "icons/k.png",
 		"default_popup": "popup/popup.html"
 	},
-
-	// "page_action": {
-	// 	"default_icon": "icons/k.png",
-	// 	"default_title": "LiveKNOXSS",
-	// 	"default_popup": "popup/popup.html"
-	// },
 
 	"background": {
 		"scripts": ["version.js", "knoxss.js"]
