@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILENAME=liveknoxss-`gitver current`.xpi
+FILENAME=liveknoxss-dev-`gitver current`.xpi
 OUT=bin/$FILENAME
 
 mkdir bin 2>/dev/null
