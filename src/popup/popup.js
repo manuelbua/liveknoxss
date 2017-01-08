@@ -64,6 +64,7 @@ function updateUI(data) {
 		ui_toggle.disabled = true;
 		hide(ui_toggle);
 		hide(ui_results);
+		hide(ui_title);
 	} else {
 		var domain = data.knoxssCurrentDomain;
 		var state = data.knoxssState[domain];
@@ -74,6 +75,7 @@ function updateUI(data) {
 		// state.urls = ['http://yahoo.com'];
 
 		show(ui_toggle);
+		show(ui_title);
 		hide(ui_results);
 
 		// domain
