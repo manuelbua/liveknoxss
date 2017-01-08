@@ -49,8 +49,14 @@ function getOrCreateState(domain) {
 	return hasState(domain) ? getState(domain) : createState(domain);
 }
 
-function setCurrentDomain(domain) {
-	browser.storage.local.set({knoxssCurrentDomain: domain});
+/* set the domain whose state information is to be shown in the popup, only if the request is coming from the active tab */
+function setPopupDomain(tab, domain) {
+	getActiveTab().then((tabs) => {
+		var activeTab = tabs[0];
+		if(tab.id == activeTab.id) {
+			browser.storage.local.set({knoxssCurrentDomain: domain});
+		}
+	});
 }
 
 /* track newly activated tabs, reflect extension state for this tab in the button UI */
@@ -63,10 +69,10 @@ function tabActivated(info) {
 			// ensure a state entry is present for this domain
 			var ds = getOrCreateState(domain);
 			updateUI(tab, domain, ds);
-			setCurrentDomain(domain);
+			setPopupDomain(tab, domain);
 		} else {
 			console.log("Ignoring activated request on invalid domain \"" + domain + "\"");
-			setCurrentDomain("");
+			setPopupDomain(tab, "");
 			updateUI(tab, domain, false);
 		}
 	});
@@ -111,7 +117,7 @@ function tabUpdate(tabId, changeInfo, tab) {
 		var currentUrl = tab.url;
 		var domain = getDomainFromURL(currentUrl);
 		if(isValidDomain(domain)) {
-			setCurrentDomain(domain);
+			setPopupDomain(tab, domain);
 
 			var ds = getOrCreateState(domain);
 			if( ds.active ) {
@@ -135,7 +141,7 @@ function tabUpdate(tabId, changeInfo, tab) {
 			}
 		} else {
 			console.log("Ignoring update request on invalid domain \"" + domain + "\"");
-			setCurrentDomain("");
+			setPopupDomain(tab, "");
 			updateUI(tab, domain, false);
 		}
 	}
@@ -182,33 +188,39 @@ function getActiveTab() {
 	return browser.tabs.query({active: true, currentWindow: true});
 }
 
-/* update the button state for the specified tab */
-
-/*
-	TODO: use different icons instead of using only one.
-
-	Currently the KNOXSS icon is used to signal XSS presence as a page action:
-	some proper graphics should be done the same as the current badge appears
-	on the Toggle toolbar extension's button.
-*/
-
+/* update the browser_action button only if the request is coming from the active tab */
 function updateUI(tab, domain, state) {
-	if(!state || (state && !state.active && !state.xssed)) {
-		setBadge("", "");
+	/*
+		TODO: use different icons instead of using only one.
+		TODO2: verify using both a `browser_action` and a `page_action` is supported
+		across browsers (it doesn't look it will be supported on Chrome ;/)
 
-		browser.pageAction.hide(tab.id);
-		console.log("LiveKNOXSS not active for " + (!isValidDomain(domain) ? "invalid domain " : "") + "\"" + domain + "\"");
-	} else if( state.active ) {
-		setBadge("on", "#FFA500");
+		Currently the KNOXSS icon is used to signal XSS presence as a page action:
+		some proper graphics should be done the same as the current badge appears
+		on the Toggle toolbar extension's button.
+	*/
 
-		browser.pageAction.hide(tab.id);
-		console.log("LiveKNOXSS active for \"" + domain + "\"");
-	} else if( state.xssed ) {
-		setBadge("XSS", "#FF0000");
+	getActiveTab().then((tabs) => {
+		var activeTab = tabs[0];
+		if(activeTab.id == tab.id) {
+			if(!state || (state && !state.active && !state.xssed)) {
+				setBadge("", "");
 
-		browser.pageAction.show(tab.id);
-		console.log("The KNOXSS service found an XSS vulnerability on \"" + domain + "\"!\r\nVulnerable: " + state.urls[0]);
-	}
+				browser.pageAction.hide(tab.id);
+				console.log("LiveKNOXSS not active for " + (!isValidDomain(domain) ? "invalid domain " : "") + "\"" + domain + "\"");
+			} else if( state.active ) {
+				setBadge("on", "#FFA500");
+
+				browser.pageAction.hide(tab.id);
+				console.log("LiveKNOXSS active for \"" + domain + "\"");
+			} else if( state.xssed ) {
+				setBadge("XSS", "#FF0000");
+
+				browser.pageAction.show(tab.id);
+				console.log("The KNOXSS service found an XSS vulnerability on \"" + domain + "\"!\r\nVulnerable: " + state.urls[0]);
+			}
+		}
+	});
 }
 
 function notify(title, text) {
