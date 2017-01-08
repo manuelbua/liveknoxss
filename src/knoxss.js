@@ -72,8 +72,7 @@ function tabActivated(info) {
 	});
 }
 
-/* button clicked, show popup for the currently active tab */
-
+/* listen for incoming toggle requests for the active tab */
 browser.runtime.onMessage.addListener(onMessage);
 function onMessage(request, sender, sendResponse) {
 	if( request.toggle ) {
@@ -84,6 +83,7 @@ function onMessage(request, sender, sendResponse) {
 	return true;
 }
 
+/* toggle the extension state for the currently active tab */
 function toggleState(sendResponse) {
 	getActiveTab().then((tabs) => {
 		var tab = tabs[0];
