@@ -5,15 +5,16 @@ var ui_icon = document.querySelector('img#icon');
 var ui_domain = document.querySelector('#domain');
 var ui_state = document.querySelector('#state');
 var ui_toggle = document.querySelector('#toggle');
-var ui_results = document.querySelector('#results');
+var ui_result = document.querySelector('#result');
 var ui_title = document.querySelector('#title');
 var ui_linktext = document.querySelector('#linktext');
 var ui_view = document.querySelector('#view');
 var ui_copy = document.querySelector('#copy');
 var ui_versioninfo = document.querySelector('#versioninfo');
 var ui_opennewtab = document.querySelectorAll('.open-newtab');
+var ui_domainlist = document.querySelector('div#domainlist');
 
-/* force links to open in new tabs */
+// force links to open in new tabs
 for(var e of ui_opennewtab) {
 	e.onclick = function(e) {
 		// open new tab
@@ -25,96 +26,178 @@ for(var e of ui_opennewtab) {
 	}
 }
 
-/* Utilities */
+/* low-level utilities */
+
+function hide(e) {
+	e.class = "hidden";
+	e.style.display = "none";
+	return e;
+}
+
+function show(e) {
+	e.class = "";
+	e.style.display = "";
+	return e;
+}
+
+function enable(e) {
+	e.disabled = false;
+	return e;
+}
+
+function disable(e) {
+	e.disabled = true;
+	return e;
+}
+
 function getVersion() {
 	return typeof version !== 'undefined' ? ('v' + version) : '(unknown build)';
 }
 
 function setText(e, text) {
 	e.textContent = text;
+	return e;
 }
 
 function setHtml(e, html) {
 	e.innerHTML = html;
+	return e;
 }
 
-function getActiveTab() {
-	return browser.tabs.query({active: true, currentWindow: true});
+/* abstraction utilities */
+
+function setVersionInfo(version) {
+	setHtml(ui_versioninfo, "LiveKNOXSS <strong>" + version + "</strong>");
 }
 
-function hide(e) {
-	e.class = "hidden";
-	e.style.display = "none";
+function setIcon(iconResource) {
+	ui_icon.src = browser.extension.getURL(iconResource);
+	return e;
 }
 
-function show(e) {
-	e.class = "";
-	e.style.display = "";
+function setDomain(domain) {
+	setHtml(ui_domain, domain);
 }
 
+function setState(state) {
+	setHtml(ui_state, state);
+}
+
+function disableToggle() {
+	hide(disable(setHtml(ui_toggle, "(disabled)")));
+}
+
+function enableToggle(html) {
+	show(enable(setHtml(ui_toggle, html)));
+}
+
+function showTitle(html) {
+	show(setHtml(ui_title, html));
+}
+
+function hideTitle() {
+	setHtml(ui_title, "");
+	hide(ui_title);
+}
+
+function showResult(url) {
+	show(ui_result);
+	ui_linktext.value = url;
+	ui_view.href = url;
+}
+
+function hideResult() {
+	hide(ui_result);
+	ui_linktext.value = '';
+	ui_view.href = '';
+}
+
+function copyResultLinkToClipboard() {
+	ui_linktext.select();
+	document.execCommand("copy");
+}
+
+function showDomainList(domain_state) {
+	show(ui_domainlist);
+	var html = '<h4>Domains seen this session:</h4>';
+	for(var d in domain_state) {
+		var s = domain_state[d];
+		html += '<div class="domainitem">';
+		html += '<label  ' + (s.active ? 'title="LiveKNOXSS is active on this domain."' : '') + '><input disabled type=checkbox data-domain="' + d + '" ' + (s.active ? 'checked' : '') + '/><span>' + d + '</span>';
+		html += '</div>';
+		// console.log(d);
+	}
+
+	setHtml(ui_domainlist, html);
+}
+
+function hideDomainList() {
+	setHtml(ui_domainlist, "");
+	hide(ui_domainlist);
+}
+
+// resets the UI to a minimal state, only the icon, the
+// domain and the state are shown
+function resetUI() {
+	show(ui_icon);
+	show(ui_domain);
+	show(ui_state);
+
+	disableToggle();
+	hideResult();
+	hideTitle();
+	hideDomainList();
+}
+
+// update the UI to reflect the state of the specified data
 function updateUI(data) {
-	ui_icon.src = browser.extension.getURL('icons/k.png');
-	setHtml(ui_versioninfo, "LiveKNOXSS <strong>" + getVersion() + "</strong>");
+	setIcon('icons/k.png');
+	setVersionInfo(getVersion());
 
-	if ( !data.knoxssState || !data.knoxssCurrentDomain ) {
+	resetUI();
+
+	if( !data.knoxssState || !data.knoxssCurrentDomain ) {
 		// no state for this domain
-		setHtml(ui_domain, "<span class='unsupported'>Unsupported domain.</span>");
-		setHtml(ui_state, "LiveKNOXSS can't be activated here.");
-		ui_toggle.value = "(disabled)";
-		ui_toggle.disabled = true;
-		hide(ui_toggle);
-		hide(ui_results);
-		hide(ui_title);
+		setDomain("<span class='unsupported'>Unsupported domain.</span>");
+		setState("LiveKNOXSS can't be activated here.");
 	} else {
 		var domain = data.knoxssCurrentDomain;
 		var state = data.knoxssState[domain];
 
 		// dbg
-		// state.active = false;
 		// state.xssed = true;
 		// state.urls = ['http://yahoo.com'];
 
-		show(ui_toggle);
-		show(ui_title);
-		hide(ui_results);
-
 		// domain
-		var c = state.xssed ? "xssed" : "domain";
-		setHtml(ui_domain, "<span class='" + c + "'>" + domain + "</span>");
+		setDomain("<span class='" + (state.xssed ? "xssed" : "domain") + "'>" + domain + "</span>");
 
 		// state
-		if( state.active ) {
-			setHtml(ui_state, "LiveKNOXSS is <span class='active'>ACTIVE</span>.");
-		} else {
-			if( state.xssed ) {
-				setHtml(ui_state, "LiveKNOXSS deactivated due to XSS found.");
-			} else {
-				setHtml(ui_state, "LiveKNOXSS is <span class='inactive'>NOT</span> active.");
-			}
-		}
+		setState( 
+			state.active ? "LiveKNOXSS is <span class='active'>ACTIVE</span>."
+			: state.xssed ? "LiveKNOXSS deactivated due to XSS found."
+			: "LiveKNOXSS is <span class='inactive'>NOT</span> active."
+		);
 
 		// toggle
-		ui_toggle.disabled = false;
-		if( state.active ) {
-			setHtml(ui_toggle, "Click to <strong class='inactive'>DEACTIVATE</strong>");
-		} else {
-			setHtml(ui_toggle, "Click to" + (state.xssed ? " reset and" : "") + " <strong class='active'>ACTIVATE</strong>");
+		enableToggle( state.active 
+			? "Click to <strong class='inactive'>DEACTIVATE</strong>" 
+			: "Click to" + (state.xssed ? " reset and" : "") + " <strong class='active'>ACTIVATE</strong>"
+		);
+
+		// title, results
+		if(state.active) {
+			showTitle("No XSS found yet.");	
+		} else if( state.xssed ) {
+			showResult(state.urls[0]);
+			showTitle("<span class='xss'>An XSS has been found!</span>");
 		}
 
-		if( state.xssed ) {
-			show(ui_results);
-			setHtml(ui_title, "<span class='xss'>An XSS has been found!</span>");
-			var url = state.urls[0];
-			ui_linktext.value = url;
-			ui_view.href = url;
-		} else {
-			setText(ui_title, state.active ? "No XSS found yet." : "");
-			ui_linktext.value = '';
-			ui_view.href = '';
-		}
+		// domain list
+		showDomainList(data.knoxssState);
 	}
 }
 
+/* load storage and update UI */
 function reload() {
 	browser.storage.local.get(["knoxssState", "knoxssCurrentDomain"]).then((data) => {
 		updateUI(data);
@@ -137,11 +220,11 @@ ui_toggle.onclick = function(e) {
 
 /* copy to clipboard */
 ui_copy.onclick = function(e) {
-	ui_linktext.select();
-	document.execCommand("copy");
+	copyResultLinkToClipboard();
 }
 
 /* reload data and update UI whenever it changes */
 browser.storage.onChanged.addListener((changes, area) => { reload(); });
 
+/* kick-off a programmatic */
 reload();

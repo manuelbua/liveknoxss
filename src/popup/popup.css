@@ -12,7 +12,8 @@ html {
 body {
 	font-family: Liberation, Liberation Sans, sans, sans-serif;
 	font-size: 11px;
-	min-width: 300px;
+	min-width: 320px;
+	max-width: 320px;
 	height: auto;
 	padding: 2px;
 	margin: 2px;
@@ -44,10 +45,11 @@ td {
 }
 
 #toggle {
-	width: 100%;
+	width: 80%;
 	height: 50px;
 	text-align: center;
 	font-size: 12px;
+	margin: 0 auto;
 }
 
 .hidden {
@@ -91,4 +93,25 @@ td {
 	padding: 0;
 	border: 0;
 	border-top: 1px solid #d0d0d0;
+}
+
+#domainlist {
+	list-style-type: none;
+	text-indent: 0;
+	padding: 5px 0 0 0;
+	margin: 0;
+}
+
+#domainlist input[type="checkbox"] {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	vertical-align: middle;
+}
+
+.domainitem {
+	display: inline-block;
+	width: 50%;
+	padding: 0;
+	margin: 0;
 }

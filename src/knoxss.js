@@ -78,10 +78,11 @@ function tabActivated(info) {
 	});
 }
 
-/* listen for incoming toggle requests for the active tab */
+/* listen for incoming messages */
 browser.runtime.onMessage.addListener(onMessage);
 function onMessage(request, sender, sendResponse) {
 	if( request.toggle ) {
+		// toggle extension state for the active tab
 		toggleState(sendResponse);
 	}
 
