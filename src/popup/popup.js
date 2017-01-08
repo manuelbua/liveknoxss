@@ -96,10 +96,7 @@ function updateUI(data) {
 		if( state.active ) {
 			setHtml(ui_toggle, "Click to <strong class='inactive'>DEACTIVATE</strong>");
 		} else {
-			setHtml(ui_toggle, "Click to <strong class='active'>ACTIVATE</strong>");
-			if( state.xssed ) {
-				ui_toggle.value += " (will reset XSS results)";
-			}
+			setHtml(ui_toggle, "Click to" + (state.xssed ? " reset and" : "") + " <strong class='active'>ACTIVATE</strong>");
 		}
 
 		if( state.xssed ) {
