@@ -183,17 +183,30 @@ function getActiveTab() {
 }
 
 /* update the button state for the specified tab */
+
+/*
+	TODO: use different icons instead of using only one.
+
+	Currently the KNOXSS icon is used to signal XSS presence as a page action:
+	some proper graphics should be done the same as the current badge appears
+	on the Toggle toolbar extension's button.
+*/
+
 function updateUI(tab, domain, state) {
 	if(!state || (state && !state.active && !state.xssed)) {
 		setBadge("", "");
-		// browser.pageAction.hide(tab.id);
+
+		browser.pageAction.hide(tab.id);
 		console.log("LiveKNOXSS not active for " + (!isValidDomain(domain) ? "invalid domain " : "") + "\"" + domain + "\"");
 	} else if( state.active ) {
 		setBadge("on", "#FFA500");
-		// browser.pageAction.show(tab.id);
+
+		browser.pageAction.hide(tab.id);
 		console.log("LiveKNOXSS active for \"" + domain + "\"");
 	} else if( state.xssed ) {
 		setBadge("XSS", "#FF0000");
+
+		browser.pageAction.show(tab.id);
 		console.log("The KNOXSS service found an XSS vulnerability on \"" + domain + "\"!\r\nVulnerable: " + state.urls[0]);
 	}
 }
