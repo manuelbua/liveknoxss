@@ -1,3 +1,6 @@
-#KNOXSS Extension
-Extension to communicate with KNOXSS Pro.
-https://knoxss.me
+## LiveKNOXSS Extension
+
+by [@therealdudez](https://twitter.com/therealdudez)
+
+### Description
+Extension to communicate with the KNOXSS Pro service at https://knoxss.me
