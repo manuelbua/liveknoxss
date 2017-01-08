@@ -230,6 +230,7 @@ function queryKnoxss(tab, domain, url, cookies) {
 			var headers = new Headers({
 				'Accept': 'text/html,application/xhtml+xml,application/xml',
 				'Content-Type': 'application/x-www-form-urlencoded',
+				'X-WebExtension': "LiveKNOXSS " + getVersion().replace(/[^0-9A-Za-z\.\-\+]/g,""),
 				'Cookie': kauth
 			});
 
@@ -240,11 +241,10 @@ function queryKnoxss(tab, domain, url, cookies) {
 				credentials: "include",
 				headers: headers
 			};
-			// console.log(init);
 
-			var ds = getState(domain);
-
+			// make the request
 			var knoxssRequest = new Request(knoxssUrl, init);
+
 			fetch(knoxssRequest).then(function(response) {
 				return response.text().then(function(body) {
 					// console.log(body);
@@ -255,6 +255,7 @@ function queryKnoxss(tab, domain, url, cookies) {
 						var vulnerable = body.match(/window\.open\('(.[^']*)'/)[1];
 
 						// update state and button UI
+						var ds = getState(domain);
 						ds.active = false;
 						ds.xssed = true;
 						ds.urls = [ vulnerable ];
