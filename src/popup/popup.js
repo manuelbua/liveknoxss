@@ -187,7 +187,6 @@ function updateUI(data) {
 
 	var domain = data.current_domain;
 	var states = data.domain_state;
-	var state = states[domain];
 
 	if( !states ) {
 		setDomain("<span class='unsupported'>No data.</span>");
@@ -203,7 +202,9 @@ function updateUI(data) {
 		showClearState();
 	}
 
-	if( state && domain ) {
+	if( states && domain ) {
+		var state = states[domain];
+
 		// dbg
 		// state.xssed = true;
 
