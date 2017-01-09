@@ -15,6 +15,7 @@ var ui_opennewtab = document.querySelectorAll('.open-newtab');
 var ui_domainlist = document.querySelector('div#domainlist');
 var ui_domdivider = document.querySelector('#domdivider');
 var ui_resultset = document.querySelector('#resultset');
+var ui_cleardomains = document.querySelector('#cleardomains');
 
 // force links to open in new tabs
 for(var e of ui_opennewtab) {
@@ -69,7 +70,7 @@ function setHtml(e, html) {
 /* abstraction utilities */
 
 function setVersionInfo(version) {
-	setHtml(ui_versioninfo, "LiveKNOXSS <strong>" + version + "</strong>");
+	setHtml(ui_versioninfo, " <strong>" + version + "</strong>");
 }
 
 function setIcon(iconResource) {
@@ -129,7 +130,7 @@ function showDomainList(domain_state) {
 	for(var d in domain_state) {
 		var s = domain_state[d];
 		html += '<div class="domainitem">';
-		html += '<label  ' + (s.active ? 'title="LiveKNOXSS is active on this domain."' : '') + '><input disabled type=checkbox data-domain="' + d + '" ' + (s.active ? 'checked' : '') + '/><span>' + d + '</span>';
+		html += '<label><input disabled type=checkbox data-domain="' + d + '" ' + (s.active ? 'checked' : '') + '/><span>' + d + '</span>';
 		html += '</div>';
 		// console.log(d);
 	}
@@ -163,8 +164,19 @@ function updateUI(data) {
 
 	resetUI();
 
-	if( !data.knoxssState || !data.knoxssCurrentDomain ) {
-		// no state for this domain
+	if( !data.knoxssState ) {
+		// no state
+		setDomain("<span class='unsupported'>Unknown domain.</span>");
+		setState("LiveKNOXSS can't be activated here.");
+	} else {
+		// domain list
+		if( Object.keys(data.knoxssState).length ) {
+			showDomainList(data.knoxssState);
+		}
+	}
+
+	if( !data.knoxssCurrentDomain ) {
+		// no domain set
 		setDomain("<span class='unsupported'>Unsupported domain.</span>");
 		setState("LiveKNOXSS can't be activated here.");
 	} else {
@@ -198,9 +210,6 @@ function updateUI(data) {
 			showResult(state.urls[0]);
 			showTitle("<span class='xss'>An XSS has been found!</span>");
 		}
-
-		// domain list
-		showDomainList(data.knoxssState);
 	}
 }
 
@@ -213,16 +222,13 @@ function reload() {
 
 /* tell the background script to toggle the extension for this domain */
 ui_toggle.onclick = function(e) {
-	browser.runtime.sendMessage({toggle: true}).then(
-		function(response) {
-			if( response.toggled ) {
-				reload();
-			}
-		},
-		function(error) {
-			console.log("Error toggling", error);
-		}
-	);
+	browser.runtime.sendMessage({toggle: true});
+}
+
+/* tell the background script to reset the domains state */
+
+ui_cleardomains.onclick = function(e) {
+	browser.runtime.sendMessage({clear_state: true});
 }
 
 /* copy to clipboard */

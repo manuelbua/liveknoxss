@@ -12,6 +12,11 @@ var domain_state = {
 	*/
 };
 
+
+function storeState() {
+	browser.storage.local.set({knoxssState: domain_state});
+}
+
 function createState(domain) {
 	setState(domain, {
 		active: false, 
@@ -38,11 +43,7 @@ function setState(domain, state) {
 		domain_state[domain][k] = state[k];
 	}
 
-	browser.storage.local.set({knoxssState: domain_state});
-}
-
-function removeState(domain) {
-	delete domain_state[domain];
+	storeState();
 }
 
 function getOrCreateState(domain) {
@@ -84,10 +85,17 @@ function onMessage(request, sender, sendResponse) {
 	if( request.toggle ) {
 		// toggle extension state for the active tab
 		toggleState(sendResponse);
+		// keep the channel open, we'll async sendResponse
+		// return true;
+	} else if( request.clear_state ) {
+		// clear domain state
+		domain_state = {};
+		setPopupDomain("");
+		storeState();
+		syncWithActiveTab();
+		// return false;
 	}
-
-	// keep the channel open, we'll async sendResponse
-	return true;
+	return false;
 }
 
 /* toggle the extension state for the currently active tab */
@@ -148,8 +156,7 @@ function tabUpdate(tabId, changeInfo, tab) {
 	}
 }
 
-function main() {
-	console.log("This is LiveKNOXSS " + getVersion());
+function syncWithActiveTab() {
 	/* update the state for the currently active tab */
 	getActiveTab().then((tabs) => {
 		var tab = tabs[0];
@@ -157,7 +164,8 @@ function main() {
 	});
 }
 
-main();
+console.log("This is LiveKNOXSS " + getVersion());
+syncWithActiveTab();
 
 
 /** Utilities */

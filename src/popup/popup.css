@@ -44,12 +44,17 @@ td {
 	color: #2020ff !important;
 }
 
-#toggle {
+#toggle, #cleardomains {
 	width: 90%;
 	height: 50px;
 	text-align: center;
 	font-size: 12px;
 	margin: 0 auto 5px;
+}
+
+#cleardomains {
+	height: 20px;
+	font-size: 11px;
 }
 
 #toggle:-moz-focus-inner,
