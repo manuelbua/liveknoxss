@@ -1,3 +1,5 @@
+![KNOXSS icon](http://i.imgur.com/T8wCFbb.png)
+
 ## LiveKNOXSS Browser Extension
 
 by [@therealdudez](https://twitter.com/therealdudez)
@@ -23,7 +25,6 @@ Any cookie that belongs to the specified domain will also be automatically colle
 ### Privacy
 
 Depending on your environment, target, permissions, assumptions and knowledge, this may pose either an acceptable or unacceptable security risk: this is no different than using the [web interface](https://knoxss.me/pro) available with your subscription, but the fact this is now **automated** can expose to unintentional information leaks, so be wise!
-
 
 ### Known limitations
 
