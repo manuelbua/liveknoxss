@@ -1,5 +1,7 @@
-// coded by dudez
-// https://twitter.com/therealdudez
+/*
+	The Popup script responsible to show information associated with
+	a domain: it's synchronized wi
+*/
 
 var ui_icon = document.querySelector('img#icon');
 var ui_domain = document.querySelector('#domain');
@@ -15,7 +17,7 @@ var ui_opennewtab = document.querySelectorAll('.open-newtab');
 var ui_domainlist = document.querySelector('div#domainlist');
 var ui_domdivider = document.querySelector('#domdivider');
 var ui_resultset = document.querySelector('#resultset');
-var ui_cleardomains = document.querySelector('#cleardomains');
+var ui_clearstate = document.querySelector('#clearstate');
 
 // force links to open in new tabs
 for(var e of ui_opennewtab) {
@@ -67,7 +69,14 @@ function setHtml(e, html) {
 	return e;
 }
 
-/* abstraction utilities */
+function hasKeys(o) {
+	if( typeof o !== 'undefined' && o ) {
+		return Object.keys(o).length;
+	}
+	return false;
+}
+
+/* UI abstraction utilities */
 
 function setVersionInfo(version) {
 	setHtml(ui_versioninfo, " <strong>" + version + "</strong>");
@@ -122,17 +131,20 @@ function copyResultLinkToClipboard() {
 	document.execCommand("copy");
 }
 
-function showDomainList(domain_state) {
+function showDomainList(domain_state, domain) {
 	show(ui_domainlist);
 	show(ui_domdivider);
 
 	var html = '<h4>Domains seen this session:</h4>';
 	for(var d in domain_state) {
 		var s = domain_state[d];
-		html += '<div class="domainitem">';
-		html += '<label><input disabled type=checkbox data-domain="' + d + '" ' + (s.active ? 'checked' : '') + '/><span>' + d + '</span>';
+		var currenttab = (d === domain) ? ' current-tab ' : '';
+		var active = s.active ? ' isactive ' : '';
+		var xssed = s.xssed ? ' xssed ' : '';
+		html += '<div class="domainitem ' + currenttab +'">';
+		html += '<input disabled type=checkbox data-domain="' + d + '" ' + (s.active ? 'checked' : '') + '/>';
+		html += '<span class="' + xssed + active + '">' + d + '</span>';
 		html += '</div>';
-		// console.log(d);
 	}
 
 	setHtml(ui_domainlist, html);
@@ -142,6 +154,14 @@ function hideDomainList() {
 	setHtml(ui_domainlist, "");
 	hide(ui_domainlist);
 	hide(ui_domdivider);
+}
+
+function showClearState() {
+	show(ui_clearstate);
+}
+
+function hideClearState() {
+	hide(ui_clearstate);
 }
 
 // resets the UI to a minimal state, only the icon, the
@@ -155,6 +175,7 @@ function resetUI() {
 	hideResult();
 	hideTitle();
 	hideDomainList();
+	hideClearState();
 }
 
 // update the UI to reflect the state of the specified data
@@ -164,70 +185,62 @@ function updateUI(data) {
 
 	resetUI();
 
-	if( !data.knoxssState ) {
-		// no state
-		setDomain("<span class='unsupported'>Unknown domain.</span>");
-		setState("LiveKNOXSS can't be activated here.");
-	} else {
-		// domain list
-		if( Object.keys(data.knoxssState).length ) {
-			showDomainList(data.knoxssState);
-		}
-	}
+	var domain = data.current_domain;
+	var states = data.domain_state;
+	var state = states[domain];
 
-	if( !data.knoxssCurrentDomain ) {
-		// no domain set
+	if( !states ) {
+		setDomain("<span class='unsupported'>No data.</span>");
+		setState("LiveKNOXSS can't be activated here.");
+	} else if( !domain ) {
 		setDomain("<span class='unsupported'>Unsupported domain.</span>");
 		setState("LiveKNOXSS can't be activated here.");
-	} else {
-		var domain = data.knoxssCurrentDomain;
-		var state = data.knoxssState[domain];
+	}
 
+	// domain list
+	if( hasKeys(data.domain_state) ) {
+		showDomainList(data.domain_state, domain ? domain : false);
+		showClearState();
+	}
+
+	if( state && domain ) {
 		// dbg
 		// state.xssed = true;
-		// state.urls = ['http://yahoo.com'];
 
 		// domain
 		setDomain("<span class='" + (state.xssed ? "xssed" : "domain") + "'>" + domain + "</span>");
 
-		// state
-		setState( 
-			state.active ? "LiveKNOXSS is <span class='active'>ACTIVE</span>."
-			: state.xssed ? "LiveKNOXSS deactivated due to XSS found."
-			: "LiveKNOXSS is <span class='inactive'>NOT</span> active."
-		);
-
-		// toggle
-		enableToggle( state.active 
-			? "Click to <strong class='inactive'>DEACTIVATE</strong>" 
-			: "Click to" + (state.xssed ? " reset and" : "") + " <strong class='active'>ACTIVATE</strong>"
-		);
-
-		// title, results
-		if(state.active) {
+		if( state.active ) {
 			showTitle("No XSS found yet.");	
+			setState("LiveKNOXSS is <span class='active'>ACTIVE</span>.");
+			enableToggle("Click to <strong class='inactive'>DEACTIVATE</strong>");
 		} else if( state.xssed ) {
-			showResult(state.urls[0]);
 			showTitle("<span class='xss'>An XSS has been found!</span>");
+			setState("LiveKNOXSS deactivated due to XSS found.");
+			enableToggle("Click to <em>reset</em> and <strong class='active'>re-ACTIVATE</strong>");
+			showResult(state.urls[0]);
+		} else {
+			setState("LiveKNOXSS is <span class='inactive'>NOT</span> active.");
+			enableToggle("Click to <strong class='active'>ACTIVATE</strong>");
 		}
 	}
 }
 
 /* load storage and update UI */
 function reload() {
-	browser.storage.local.get(["knoxssState", "knoxssCurrentDomain"]).then((data) => {
+	browser.storage.local.get(["domain_state", "current_domain"]).then((data) => {
 		updateUI(data);
 	});
 }
 
-/* tell the background script to toggle the extension for this domain */
+/* request to toggle the extension for this domain */
 ui_toggle.onclick = function(e) {
 	browser.runtime.sendMessage({toggle: true});
 }
 
 /* tell the background script to reset the domains state */
 
-ui_cleardomains.onclick = function(e) {
+ui_clearstate.onclick = function(e) {
 	browser.runtime.sendMessage({clear_state: true});
 }
 
@@ -236,8 +249,8 @@ ui_copy.onclick = function(e) {
 	copyResultLinkToClipboard();
 }
 
-/* reload data and update UI whenever it changes */
+/* sync UI to data changes */
 browser.storage.onChanged.addListener((changes, area) => { reload(); });
 
-/* kick-off a programmatic */
+/* trigger a UI reload */
 reload();
