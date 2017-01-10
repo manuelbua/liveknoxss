@@ -208,7 +208,8 @@ function getActiveTab() {
 	return browser.tabs.query({active: true, currentWindow: true});
 }
 
-/* update the browser_action button only if the request is coming from the active tab */
+// update the browser_action button only if either the request comes from the active tab
+// or the domain is the same for both tabs
 function updateUI(tab, domain, state) {
 	/*
 		TODO: use different icons instead of using only one.
@@ -222,7 +223,10 @@ function updateUI(tab, domain, state) {
 
 	getActiveTab().then((tabs) => {
 		var activeTab = tabs[0];
-		if(activeTab.id == tab.id) {
+		var canUpdate = (activeTab.id == tab.id) || (getDomainFromURL(activeTab.url) === getDomainFromURL(tab.url));
+		console.log("active", activeTab);
+		console.log("other", tab);
+		if( canUpdate ) {
 			if(!state || (state && !state.active && !state.xssed)) {
 				setBadge("", "");
 
