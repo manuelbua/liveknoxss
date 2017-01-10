@@ -225,8 +225,6 @@ function updateUI(tab, domain, state) {
 	getActiveTab().then((tabs) => {
 		var activeTab = tabs[0];
 		var canUpdate = (activeTab.id == tab.id) || (getDomainFromURL(activeTab.url) === getDomainFromURL(tab.url));
-		console.log("active", activeTab);
-		console.log("other", tab);
 		if( canUpdate ) {
 			if(!state || (state && !state.active && !state.xssed)) {
 				setBadge("", "");
