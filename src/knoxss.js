@@ -1,4 +1,6 @@
 /*
+	The background script responsible to monitor browsing activity and to live
+	scan URLs via the KNOXSS service.
 */
 
 /* keep track of the extension's state state across the tabs */
