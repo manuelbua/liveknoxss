@@ -2,7 +2,7 @@
 
 ## LiveKNOXSS Browser Extension
 
-by [@therealdudez](https://twitter.com/therealdudez)
+by [@dudez](https://twitter.com/therealdudez)
 
 ### Description
 
