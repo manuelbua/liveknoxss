@@ -232,12 +232,12 @@ function updateUI(tab, domain, state) {
 				browser.pageAction.hide(tab.id);
 				console.log("LiveKNOXSS not active for " + (!isValidDomain(domain) ? "invalid domain " : "") + "\"" + domain + "\"");
 			} else if( state.active ) {
-				setBadge("on", "#FFA500");
+				setBadge("on", "#20c020");
 
 				browser.pageAction.hide(tab.id);
 				console.log("LiveKNOXSS active for \"" + domain + "\"");
 			} else if( state.xssed ) {
-				setBadge("XSS", "#FF0000");
+				setBadge("XSS", "#ff2020");
 
 				browser.pageAction.show(tab.id);
 				console.log("The KNOXSS service found an XSS vulnerability on \"" + domain + "\"!\r\nVulnerable: " + state.urls[0]);
