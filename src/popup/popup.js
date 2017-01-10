@@ -209,12 +209,12 @@ function updateUI(data) {
 		// state.xssed = true;
 
 		// domain
-		setDomain("<span class='" + (state.xssed ? "xssed" : "domain") + "'>" + domain + "</span>");
+		setDomain("<span class='domain " + (state.xssed ? "xssed" : state.active ? "active" : "") + "'>" + domain + "</span>");
 
 		if( state.active ) {
 			showTitle("No XSS found yet.");	
 			setState("LiveKNOXSS is <span class='active'>ACTIVE</span>.");
-			enableToggle("Click to <strong class='inactive'>DEACTIVATE</strong>");
+			enableToggle("Click to <strong>DEACTIVATE</strong>");
 		} else if( state.xssed ) {
 			showTitle("<span class='xss'>An XSS has been found!</span>");
 			setState("LiveKNOXSS deactivated due to XSS found.");

@@ -29,7 +29,7 @@ td {
 }
 
 .active {
-	color: #20af20 !important;
+	color: #2020ff !important;
 }
 
 .inactive, .xssed {
@@ -41,7 +41,7 @@ td {
 }
 
 .domain {
-	color: #2020ff !important;
+	text-shadow: 1px 1px #e0e0e0;
 }
 
 #toggle, #clearstate {
