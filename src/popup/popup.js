@@ -246,7 +246,7 @@ function updateUI(data) {
 			setState("LiveKNOXSS is <span class='active'>ACTIVE</span>.");
 			enableToggle("Click to <strong>DEACTIVATE</strong>");
 		} else if( state.xssed ) {
-			showTitle("<span class='xss'>An XSS has been found!</span>");
+			showTitle("<span class='xss'>XSS found on this domain!</span>");
 			setState("LiveKNOXSS deactivated due to XSS found.");
 			enableToggle("Click to <em>reset</em> and <strong class='active'>re-ACTIVATE</strong>");
 			showResults(state.urls);

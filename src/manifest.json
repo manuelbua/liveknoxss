@@ -23,12 +23,6 @@
 		"default_popup": "popup/popup.html"
 	},
 
-	"page_action": {
-		"default_icon": "icons/k.png",
-		"default_title": "LiveKNOXSS",
-		"default_popup": "popup/popup.html"
-	},
-
 	"background": {
 		"scripts": ["version.js", "knoxss.js"]
 	},
