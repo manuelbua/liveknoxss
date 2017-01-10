@@ -306,7 +306,14 @@ function queryKnoxss(tab, domain, url, cookies) {
 						var ds = getState(domain);
 						ds.active = false;
 						ds.xssed = true;
-						ds.urls = [ vulnerable ];
+
+						// collect the URL if it isn't already there
+						if(ds.urls && ds.urls.indexOf(vulnerable) == -1 ) {
+							ds.urls.push(vulnerable);
+						} else {
+							ds.urls = [ vulnerable ];
+						}
+
 						setState(domain, ds);
 						updateUI(tab, domain, ds);
 

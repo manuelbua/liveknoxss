@@ -82,7 +82,7 @@ td {
 	font-size: 12px;
 }
 
-#linktext {
+.linktext {
 	font-family: monospace;
 	padding: 4px;
 	border: solid 1px #efefef;
@@ -123,23 +123,23 @@ hr {
 .domainitem {
 	display: inline-block;
 	width: 50%;
-	padding: 0;
 	margin: 0;
-	border-radius: 8px;
+	padding: 5px;
 	/*border: 1px solid transparent;*/
 }
 
-.domainitem.current-tab {
-	/*border: 1px solid rgba(0,0,0,0.2);*/
-	background-color: rgba(0,0,0,0.1);
+.domainitem span {
+	border: 1px solid transparent;
+	border-radius: 8px;
+	padding: 4px 6px;
 }
 
-.domainitem span.isactive {
-	color: blue;
+.domainitem.current-tab span {
+	border: 1px solid rgba(0,0,0,0.1);
+	background-color: #ffffff;
 }
 
-.domainitem span.xssed {
-	color: red !important;
+.domainitem.xssed span {
 	font-weight: bold;
 }
 
