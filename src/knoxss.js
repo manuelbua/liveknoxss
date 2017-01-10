@@ -91,7 +91,8 @@ function tabUpdate(tabId, changeInfo, tab) {
 			if( ds.active ) {
 				// the extension is active for the specified domain
 
-				// get any previously set cookie for this domain
+				// get any previously set cookie for this domain and query KNOXSS
+				// with this tab's URL
 				browser.cookies.getAll({domain: domain}).then((cookie) => {
 					var cookies = '';
 					if( cookie.length ) {
@@ -294,6 +295,8 @@ function queryKnoxss(tab, domain, url, cookies) {
 			// make the request
 			var knoxssRequest = new Request(knoxssUrl, init);
 
+			// NOTE: the response here might come very late (network latency, connection errors..) and 
+			// the state might have been updated already within the request-response time window.
 			fetch(knoxssRequest).then(function(response) {
 				return response.text().then(function(body) {
 					// XSS found?
