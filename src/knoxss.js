@@ -303,9 +303,11 @@ function queryKnoxss(tab, domain, url, cookies) {
 						ds.active = false;
 						ds.xssed = true;
 
-						// collect the URL if it isn't already there
-						if(ds.urls && ds.urls.indexOf(vulnerable) == -1 ) {
-							ds.urls.push(vulnerable);
+						if( ds.urls ) {
+							// collect the URL if it isn't already there
+							if( ds.urls.indexOf(vulnerable) == -1 ) {
+								ds.urls.push(vulnerable);
+							}
 						} else {
 							ds.urls = [ vulnerable ];
 						}
