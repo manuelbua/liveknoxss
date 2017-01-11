@@ -119,17 +119,18 @@ function showResults(urls) {
 		show(ui_results);
 		show(ui_resultset);
 
-		var linktexts = "";
-		var linktools = "";
+		var html = "";
 		for(var id in urls) {
 			// create and append elements
 			var url = urls[id];
-			linktexts += '<input class="linktext" id="linktext' + id +'" readonly value="' + url.replace(/"/g, '&quot;') + '" />';
-			linktools += '<a id="linkview' + id + '" href="javascript:">view</a><br/><a id="linkcopy' + id + '" href="javascript:">copy</a><br/>';
+			html += '<tr>';
+			html += '<td width="100%"><input class="linktext" id="linktext' + id +'" readonly value="' + url.replace(/"/g, '&quot;') + '" /></td>';
+			html += '<td><a id="linkview' + id + '" href="javascript:">view</a><br/><a id="linkcopy' + id + '" href="javascript:">copy</a></td>';
+			html += '</tr>';
 		}
 
 		// attach them to the DOM
-		setHtml(ui_results, "<tr><td>" + linktexts + "</td><td>" + linktools + "</td></tr>");
+		setHtml(ui_results, html);
 
 		// attach event handlers
 		for(var id in urls) {
