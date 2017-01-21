@@ -10,6 +10,7 @@ var domain_state = {
 	domain: {
 		active: true|[false],
 		xssed: true|[false],
+		is_second_level_domain: true|false,
 		handle_subdomains: [true]|false,
 		parent_domain: '', [empty]
 		urls: [], [empty]
@@ -32,13 +33,28 @@ function setCurrentDomain(domain) {
 }
 
 function createState(domain) {
-	setState(domain, {
-		active: false, 
+	var isLevel2Domain = isSecondLevelDomain(domain);
+	var parentIsActive = false;
+	var parentDomain = getSecondLevelDomain(domain);
+
+	if(!isLevel2Domain) {
+		// it might be a subdomain of a currently active second-level domain
+		if(hasState(parentDomain)) {
+			var ds = getState(parentDomain);
+			parentIsActive = ds.active && ds.handle_subdomains;
+		}
+	}
+
+	var newState = {
+		active: parentIsActive,
 		xssed: false,
-		handle_subdomains: true,
-		parent_domain: '',
+		is_second_level_domain: isLevel2Domain,
+		handle_subdomains: isLevel2Domain,
+		parent_domain: parentDomain,
 		urls: []
-	});
+	};
+
+	setState(domain, newState);
 	return getState(domain);
 }
 
@@ -95,6 +111,8 @@ function tabUpdate(tabId, changeInfo, tab) {
 			setPopupDomain(tab, domain);
 
 			var ds = getOrCreateState(domain);
+			updateUI(tab, domain, ds);
+
 			if( ds.active ) {
 				// the extension is active for the specified domain
 
@@ -112,8 +130,6 @@ function tabUpdate(tabId, changeInfo, tab) {
 					// query the KNOXSS service
 					queryKnoxss(tab, domain, currentUrl, cookies);
 				});
-			} else {
-				updateUI(tab, domain, ds);
 			}
 		} else {
 			console.log("Ignoring update request on invalid domain \"" + domain + "\"");
@@ -174,24 +190,42 @@ function setHandleSubdomains(value) {
 	});
 }
 
+/* updates state for each subdomain that belongs to the specified domain */
 function updateSubdomainsState(domain) {
 	var ds = getOrCreateState(domain);
 
 	// search and update for subdomains
 	for(var subdomain in domain_state) {
-		if(domain!==subdomain && subdomain.endsWith(domain)) {
+		if(isSubdomainOf(domain, subdomain)) {
 			var subds = getOrCreateState(subdomain);
-			if(ds.handle_subdomains) {
-				subds.parent_domain = domain;
-				subds.active = ds.active;
-				console.log("Subdomain \"" + subdomain + "\" has been automatically " + (subds.active ? "activated" : "deactivated") + ", parent domain is \"" + subds.parent_domain + "\"");
-			} else {
-				subds.parent_domain = '';
-			}
+			subds.active = ds.handle_subdomains && ds.active;
+			console.log("Subdomain \"" + subdomain + "\" has been automatically " + (subds.active ? "activated" : "deactivated") + ", parent domain is \"" + subds.parent_domain + "\"");
 		}
 	}
 
 	storeDomainState();
+}
+
+/* whether the specified domain is a subdomain of the specified domain */
+function isSubdomainOf(domain, subdomain) {
+	var ds = getOrCreateState(domain);
+	var subds = getOrCreateState(subdomain);
+	if(ds.is_second_level_domain && !subds.is_second_level_domain && subds.parent_domain === domain) {
+		return true;
+	}
+	return false;
+}
+
+/* whether the specified domain is a second-level domain */
+function isSecondLevelDomain(domain) {
+	return (domain.split('.').length == 2);
+}
+
+function getSecondLevelDomain(domain) {
+	// early exit
+	if(isSecondLevelDomain(domain)) return domain;
+	var parts = domain.split('.');
+	return parts[parts.length-2] + "." + parts[parts.length-1];
 }
 
 // Stores and signal the specified domain as the currently active one
