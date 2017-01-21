@@ -113,7 +113,7 @@ hr {
 	width: 90%;
 }
 
-#domainlist input[type="checkbox"] {
+input[type="checkbox"] {
 	display: inline-block;
 	position: relative;
 	padding: 0;
