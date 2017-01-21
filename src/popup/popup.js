@@ -6,6 +6,9 @@
 var ui_icon = document.querySelector('img#icon');
 var ui_domain = document.querySelector('#domain');
 var ui_state = document.querySelector('#state');
+var ui_subdomains = document.querySelector('#handle_subdomains');
+var ui_subdomains_cb = document.querySelector('#handle_subdomains input[type=checkbox]');
+var ui_subdomains_text = document.querySelector('#handle_subdomains span');
 var ui_toggle = document.querySelector('#toggle');
 var ui_title = document.querySelector('#title');
 var ui_copy = document.querySelector('#copy');
@@ -190,6 +193,19 @@ function hideClearState() {
 	hide(ui_clearstate);
 }
 
+function showHandleSubdomains(domain, handleSubdomains) {
+	show(ui_subdomains);
+	show(ui_subdomains_cb);
+	setHtml(ui_subdomains_text, "Auto-activate on <strong>*." + domain + "</strong> subdomains.");
+	ui_subdomains_cb.checked = handleSubdomains;
+}
+
+function showSubdomainOf(domain) {
+	show(ui_subdomains);
+	hide(ui_subdomains_cb);
+	setHtml(ui_subdomains_text, "Subdomain of <strong>*." + domain + "</strong>");
+}
+
 // resets the UI to a minimal state, only the icon, the
 // domain and the state are shown
 function resetUI() {
@@ -197,6 +213,7 @@ function resetUI() {
 	show(ui_domain);
 	show(ui_state);
 
+	hide(ui_subdomains);
 	disableToggle();
 	hideResults();
 	hideTitle();
@@ -241,6 +258,11 @@ function updateUI(data) {
 
 		// domain
 		setDomain("<span class='domain " + (state.xssed ? "xssed" : state.active ? "active" : "") + "'>" + domain + "</span>");
+		if(state.is_second_level_domain) {
+			showHandleSubdomains(domain, state.handle_subdomains);
+		} else {
+			showSubdomainOf(state.parent_domain);
+		}
 
 		if( state.active ) {
 			showTitle("No XSS found yet.");	
@@ -276,6 +298,9 @@ ui_clearstate.onclick = function(e) {
 	browser.runtime.sendMessage({clear_state: true});
 }
 
+ui_subdomains_cb.onchange = function(e) {
+	browser.runtime.sendMessage({handle_subdomains: true, value: this.checked});
+}
 
 /* sync UI to data changes */
 browser.storage.onChanged.addListener((changes, area) => { reload(); });

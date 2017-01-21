@@ -3,13 +3,17 @@
 	scan URLs via the KNOXSS service.
 */
 
-/* keep track of the extension's state state across the tabs */
+/* keep track of the extension's state state across the tabs
+   (default value in [brackets]) */
 var domain_state = {
 	/*
 	domain: {
-		active: true|false,
-		xssed: true|false,
-		urls: []
+		active: true|[false],
+		xssed: true|[false],
+		is_second_level_domain: true|false,
+		handle_subdomains: [true]|false,
+		parent_domain: '', [empty]
+		urls: [], [empty]
 	}
 	*/
 };
@@ -29,11 +33,28 @@ function setCurrentDomain(domain) {
 }
 
 function createState(domain) {
-	setState(domain, {
-		active: false, 
+	var isLevel2Domain = isSecondLevelDomain(domain);
+	var parentIsActive = false;
+	var parentDomain = getSecondLevelDomain(domain);
+
+	if(!isLevel2Domain) {
+		// it might be a subdomain of a currently active second-level domain
+		if(hasState(parentDomain)) {
+			var ds = getState(parentDomain);
+			parentIsActive = ds.active && ds.handle_subdomains;
+		}
+	}
+
+	var newState = {
+		active: parentIsActive,
 		xssed: false,
+		is_second_level_domain: isLevel2Domain,
+		handle_subdomains: isLevel2Domain,
+		parent_domain: parentDomain,
 		urls: []
-	});
+	};
+
+	setState(domain, newState);
 	return getState(domain);
 }
 
@@ -90,6 +111,8 @@ function tabUpdate(tabId, changeInfo, tab) {
 			setPopupDomain(tab, domain);
 
 			var ds = getOrCreateState(domain);
+			updateUI(tab, domain, ds);
+
 			if( ds.active ) {
 				// the extension is active for the specified domain
 
@@ -107,8 +130,6 @@ function tabUpdate(tabId, changeInfo, tab) {
 					// query the KNOXSS service
 					queryKnoxss(tab, domain, currentUrl, cookies);
 				});
-			} else {
-				updateUI(tab, domain, ds);
 			}
 		} else {
 			console.log("Ignoring update request on invalid domain \"" + domain + "\"");
@@ -131,6 +152,9 @@ function onMessage(request, sender, sendResponse) {
 		deleteDomainState();
 		syncWithActiveTab();
 		// return false;
+	} else if( request.handle_subdomains ) {
+		// enable or disable processing of subdomains for the active tab
+		setHandleSubdomains(request.value);
 	}
 	return false;
 }
@@ -145,7 +169,64 @@ main();
 
 /** Utilities */
 
-/* UI abstraction utilities */
+/* UI and abstraction utilities */
+
+/* enables or disables the processing of subdomains for the currently active tab */
+function setHandleSubdomains(value) {
+	getActiveTab().then((tabs) => {
+		var tab = tabs[0];
+		var domain = getDomainFromURL(tab.url);
+		if(isValidDomain(domain)) {
+			var ds = getOrCreateState(domain);
+			ds.handle_subdomains = value;
+			setState(domain, ds);
+			console.log("Automatic subdomain handling " + (value ? "activated" : "deactivated") + " for \"*." + domain + "\"");
+
+			updateSubdomainsState(domain);
+			updateUI(tab, domain, ds);
+		} else {
+			console.log("Ignoring toggle processing subdomains request on invalid domain \"" + domain + "\"");
+		}
+	});
+}
+
+/* updates state for each subdomain that belongs to the specified domain */
+function updateSubdomainsState(domain) {
+	var ds = getOrCreateState(domain);
+
+	// search and update for subdomains
+	for(var subdomain in domain_state) {
+		if(isSubdomainOf(domain, subdomain)) {
+			var subds = getOrCreateState(subdomain);
+			subds.active = ds.handle_subdomains && ds.active;
+			console.log("Subdomain \"" + subdomain + "\" has been automatically " + (subds.active ? "activated" : "deactivated") + ", parent domain is \"" + subds.parent_domain + "\"");
+		}
+	}
+
+	storeDomainState();
+}
+
+/* whether the specified domain is a subdomain of the specified domain */
+function isSubdomainOf(domain, subdomain) {
+	var ds = getOrCreateState(domain);
+	var subds = getOrCreateState(subdomain);
+	if(ds.is_second_level_domain && !subds.is_second_level_domain && subds.parent_domain === domain) {
+		return true;
+	}
+	return false;
+}
+
+/* whether the specified domain is a second-level domain */
+function isSecondLevelDomain(domain) {
+	return (domain.split('.').length == 2);
+}
+
+function getSecondLevelDomain(domain) {
+	// early exit
+	if(isSecondLevelDomain(domain)) return domain;
+	var parts = domain.split('.');
+	return parts[parts.length-2] + "." + parts[parts.length-1];
+}
 
 // Stores and signal the specified domain as the currently active one
 // so `storage.onChanged` listeners may react accordingly: this only
@@ -169,6 +250,8 @@ function toggleState() {
 			ds.xssed = false;
 			ds.active = !ds.active;
 			setState(domain, ds);
+
+			updateSubdomainsState(domain);
 			updateUI(tab, domain, ds);
 		} else {
 			console.log("Ignoring toggle request on invalid domain \"" + domain + "\"");
@@ -214,16 +297,6 @@ function getActiveTab() {
 // update the browser_action button only if either the request comes from the active tab
 // or the domain is the same for both tabs
 function updateUI(tab, domain, state) {
-	/*
-		TODO: use different icons instead of using only one.
-		TODO2: verify using both a `browser_action` and a `page_action` is supported
-		across browsers (it doesn't look it will be supported on Chrome ;/)
-
-		Currently the KNOXSS icon is used to signal XSS presence as a page action:
-		some proper graphics should be done the same as the current badge appears
-		on the Toggle toolbar extension's button.
-	*/
-
 	getActiveTab().then((tabs) => {
 		var activeTab = tabs[0];
 		var canUpdate = (activeTab.id == tab.id) || (getDomainFromURL(activeTab.url) === getDomainFromURL(tab.url));

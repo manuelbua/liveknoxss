@@ -113,11 +113,19 @@ hr {
 	width: 90%;
 }
 
-#domainlist input[type="checkbox"] {
+#handle_subdomains {
+	display: inline-block;
+	margin: 0;
+	padding: 0 0 0 0;
+	height: 20px;
+}
+
+#handle_subdomains input[type="checkbox"] {
 	display: inline-block;
 	position: relative;
 	padding: 0;
-	vertical-align: middle;
+	margin: 0 4px 0 0;
+	vertical-align: top;
 }
 
 .domainitem {
