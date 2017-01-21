@@ -195,8 +195,15 @@ function hideClearState() {
 
 function showHandleSubdomains(domain, handleSubdomains) {
 	show(ui_subdomains);
-	setHtml(ui_subdomains_text, "Handle <strong>*." + domain + "</strong> subdomains")
+	show(ui_subdomains_cb);
+	setHtml(ui_subdomains_text, "Auto-activate on <strong>*." + domain + "</strong> subdomains.");
 	ui_subdomains_cb.checked = handleSubdomains;
+}
+
+function showSubdomainOf(domain) {
+	show(ui_subdomains);
+	hide(ui_subdomains_cb);
+	setHtml(ui_subdomains_text, "Subdomain of <strong>*." + domain + "</strong>");
 }
 
 // resets the UI to a minimal state, only the icon, the
@@ -251,7 +258,11 @@ function updateUI(data) {
 
 		// domain
 		setDomain("<span class='domain " + (state.xssed ? "xssed" : state.active ? "active" : "") + "'>" + domain + "</span>");
-		showHandleSubdomains(domain, state.handle_subdomains);
+		if(state.is_second_level_domain) {
+			showHandleSubdomains(domain, state.handle_subdomains);
+		} else {
+			showSubdomainOf(state.parent_domain);
+		}
 
 		if( state.active ) {
 			showTitle("No XSS found yet.");	
